@@ -183,6 +183,7 @@ public class RobotMap {
             public static final double L1_SPEED_SCORE = -0.175;
             public static final double CANRANGETHRESHOLDVALUE = 0.15;
             public static final double SENSORTOMECHRATIO = 55.22727273;
+            public static final int CORALCANRANGE = 57;
         }
 
        

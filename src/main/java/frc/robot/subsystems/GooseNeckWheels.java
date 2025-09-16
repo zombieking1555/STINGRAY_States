@@ -6,7 +6,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.pathplanner.lib.events.CancelCommandEvent;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -35,6 +37,8 @@ public class GooseNeckWheels extends SubsystemBase {
   }
 
   private final TalonFX wheelMotor = new TalonFX(GooseneckConstants.INTAKE_MOTOR);
+
+  private final CANrange coralRange = new CANrange(GooseneckConstants.CORALCANRANGE);
 
   private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
 
@@ -71,13 +75,16 @@ public class GooseNeckWheels extends SubsystemBase {
     return currentState.getOutput();
   }
 
+ public boolean getCoralSeen(){
+  return coralRange.getDistance().getValueAsDouble() < GooseneckConstants.CANRANGETHRESHOLDVALUE;
+ }
  
-  public void stop(){
-    wheelMotor.stopMotor();
-  }
-
   public WheelState getCurrentState(){
     return currentState;
+  }
+
+  public void stop(){
+    wheelMotor.stopMotor();
   }
 
 
