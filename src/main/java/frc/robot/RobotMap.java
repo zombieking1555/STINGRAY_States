@@ -159,46 +159,33 @@ public class RobotMap {
 
     }
 
-    public static class IntakeMap {
+    
+       
 
-        public static final int INTAKE_MOTOR_CURRENT_LIMIT = 40;
-        public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
-        public static final double GEAR_RATIO = 55.22727273;
-        public static final double WHEEL_SPEED_INTAKE = -0.2;
-        public static final double WHEEL_SPEED_SCORE = -0.4;
-        public static final double ALGAE_WHEEL_SPEED = -.8;
-        public static final double L1_SPEED_SCORE = -0.175;
-        public static final double CANRANGETHRESHOLDVALUE = 0.15;
-
-        public static class ReefStops {
+        public static class GooseneckConstants {
+            public static final double PROCESSORANGLE = 0.0966;
             public static final double L4ANGLE = .113;
-            // public static final double ELEVATORRAISEONREEFANGLE = 0.013;
-            public static final double STARTANGLE = .00;
-            public static final double SAFEANGLE = .04; //0.04
-            public static final double AGAINSTREEFANGLE = .0234;
+            public static final double STANDARDANGLE = .04; 
+            public static final double ALGAERETRIEVEANGLE = 0.117;
+            public static final double ALGAEGROUNDANGLE = 0.22;
             public static final double INTAKEANGLE = .016;
             public static final double BARGEANGLE = .022;
-            public static final double L1ANGLE = .01;  // TODO tune it!
-            public static final double L2ANGLE = .0678; // TODO tune it!
-            public static final double L3ANGLE = .0678; // TODO tune it!
-          
-        }
-
-        public static class SensorCanId {
+            public static final double L1ANGLE = .01;
+            public static final double tolerance = 0.007;
             public static final int INTAKE_MOTOR = 59;
             public static final int PIVOT_MOTOR = 58;
-            public static final int CORAL_CANRANGE = 57;
-            public static final int ALGAE_CANRANGE = 100;
-            public static final int INTAKE_ENCODER = 73;
-
-
+            public static final int INTAKE_MOTOR_CURRENT_LIMIT = 40;
+            public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
+            public static final double WHEEL_SPEED_INTAKE = -0.2;
+            public static final double WHEEL_SPEED_SCORE = -0.4;
+            public static final double ALGAE_WHEEL_SPEED = -.8;
+            public static final double ALGAE_WHEEL_SPEED_SCORE = .8;
+            public static final double L1_SPEED_SCORE = -0.175;
+            public static final double CANRANGETHRESHOLDVALUE = 0.15;
+            public static final double SENSORTOMECHRATIO = 55.22727273;
         }
 
-        public static PIDController intakePid = new PIDController(5, 0, 0);
-        public static final double ks = 0.0095;
-        public static final double kg = 0.015;
-        public static final double kgAlgae = .035;
-        public static final double ksAlgae = .01;
+       
 
         public static TalonFXConfiguration getBreakConfigurationGooseNeck() {
             TalonFXConfiguration configuration = new TalonFXConfiguration();
@@ -212,7 +199,6 @@ public class RobotMap {
             configuration.MotorOutput.NeutralMode = NeutralModeValue.Coast;
             return configuration;
         }
-    }
 
     public static class CurrentLimiter {
         public static CurrentLimitsConfigs getCurrentLimitConfiguration(double amps) {

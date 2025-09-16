@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.ElevatorMap;
@@ -188,8 +189,7 @@ public Command barge(){
 
 //Command that drives to a state and finishes when at the target
 public Command moveToStateCommand(ElevatorState state){
-  return new RunCommand(()-> setPosition(state.getTargetPosition()), this)
-  .until(this::isAtTarget);
+    return new InstantCommand(()-> setState(state), this).andThen(new RunCommand(()-> {}, this).until(this::isAtTarget));
 }
 
 }
