@@ -3,6 +3,9 @@ package frc.robot;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
 
@@ -15,20 +18,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.swerve.generated.TunerConstants;
 
 public class RobotMap {
 
     public static class SafetyMap {
-        public static final double kMaxSpeed = 6.0;
-        public static final double kMaxRotation = 1.0;
-        public static final double kMaxAcceleration = 1.0;
-        public static final double kMaxAngularAcceleration = 1.0;
-        public static final double kMaxAngularRate = Math.PI; // 3/4 of a rotation per second max angular velocity
-        public static final double kAngularRateMultiplier = 1;
-        public static final double kJoystickDeadband = 0.1;
-        public static double kMaxSpeedChange = 1;
-        public static double kFollowerCommand = 6;
-
         public static class AutonConstraints {
             public static final double kMaxSpeed = 1.0;
             public static final double kMaxAcceleration = 3.0;
@@ -39,26 +33,14 @@ public class RobotMap {
         }
 
         public static class SwerveConstants {
-            public static double kRotationP = 0.007;
-            public static double kRotationI = .000;// .0001
-            public static double kRotationD = .00;
-            public static double speedpercentage = 1.0;
-            public static double kRotationTolerance = 1.0;
-        }
-
-        public static class FODC {
-            public static final int LineCount = 72;
-            public static double AngleDiff = 0.0;
+            public static final double MAX_SPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+            public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(2).in(RadiansPerSecond);
+            public static final double L4_SLEW_RATE = 1.5;
+            public static final double BARGE_SPEED_MULTIPLIER = 0.07;
         }
     }
 
-    // USB Ports for Controllers
-    public static class UsbMap {
-        public static final int DRIVER_CONTROLLER = 0;
-        public static final int OPERATOR_CONTROLLER = 1;
-        public static CommandXboxController driverController = new CommandXboxController(DRIVER_CONTROLLER);
-        public static CommandXboxController operatorController = new CommandXboxController(OPERATOR_CONTROLLER);
-    }
+  
 
     // CAN IDs for Swerve Drive System
     public static class SwerveMap {
