@@ -17,7 +17,6 @@ import frc.robot.subsystems.swerve.CommandSwerveDrivetrain;
 public class TeleopSwerve extends Command {
   private CommandSwerveDrivetrain dt;
   private Elevator elevator;
-  private CommandXboxController controller;
   private SlewRateLimiter xLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   private SlewRateLimiter yLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   
@@ -31,7 +30,6 @@ public class TeleopSwerve extends Command {
   public TeleopSwerve(CommandSwerveDrivetrain dt, Elevator elevator, CommandXboxController controller) {
     this.dt = dt;
     this.elevator = elevator;
-    this.controller = controller;
 
     driveNormal =  dt.applyRequest(()-> new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
@@ -69,21 +67,14 @@ public class TeleopSwerve extends Command {
     Command toSchedule = driveNormal;
 
     switch(elevator.getCurrentState()){
-      case STOW:
-      case ALGAE_GROUND:
-      case LOW_ALGAE:
-      case HIGH_ALGAE:
-      case CORAL_INTAKE:
-      case L1:
-      case L2:
-      case L3:
-        toSchedule = driveNormal;
-        break;
       case L4:
         toSchedule = driveSlew;
         break;
       case BARGE:
         toSchedule = driveSlow;
+        break;
+      default:
+        toSchedule = driveNormal;
         break;
     }
 

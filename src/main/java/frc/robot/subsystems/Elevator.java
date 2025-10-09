@@ -135,6 +135,11 @@ public class Elevator extends SubsystemBase {
     return getPosition().isNear(getTargetPosition(), getTolerance());
   }
 
+  public boolean isReefAlgaeState(){
+    return getCurrentState() == ElevatorState.HIGH_ALGAE || 
+           getCurrentState() == ElevatorState.LOW_ALGAE;
+  }
+
   public Angle getPosition(){
     return elevatorLeader.getPosition().getValue();
   }
@@ -187,7 +192,7 @@ public Command barge(){
   return runOnce(()-> setState(ElevatorState.BARGE));
 }
 
-//Command that drives to a state and finishes when at the target
+/**Command that drives to a state and finishes when at the target*/
 public Command moveToStateCommand(ElevatorState state){
     return new InstantCommand(()-> setState(state), this).andThen(new RunCommand(()-> {}, this).until(this::isAtTarget));
 }

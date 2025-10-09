@@ -17,7 +17,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.units.measure.Current;
 import frc.robot.subsystems.swerve.generated.TunerConstants;
 
 public class RobotMap {
@@ -159,10 +159,12 @@ public class RobotMap {
             public static final int INTAKE_MOTOR_CURRENT_LIMIT = 40;
             public static final int PIVOT_MOTOR_CURRENT_LIMIT = 40;
             public static final double WHEEL_SPEED_INTAKE = -0.2;
+            public static final double WHEEL_SPEED_BACKTAKE = 0.2;
             public static final double WHEEL_SPEED_SCORE = -0.4;
             public static final double ALGAE_WHEEL_SPEED = -.8;
             public static final double ALGAE_WHEEL_SPEED_SCORE = .8;
             public static final double L1_SPEED_SCORE = -0.175;
+            public static final Current ALGAE_HOLD_CURRENT = Current.ofBaseUnits(0, edu.wpi.first.units.Units.Amps); // tune
             public static final double CANRANGETHRESHOLDVALUE = 0.15;
             public static final double SENSORTOMECHRATIO = 55.22727273;
             public static final int CORALCANRANGE = 57;

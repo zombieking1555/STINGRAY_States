@@ -10,9 +10,12 @@ import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.GooseneckConstants;
 
@@ -20,6 +23,7 @@ public class GooseNeckWheels extends SubsystemBase {
   public enum WheelState{
     IDLE(0),
     INTAKE(GooseneckConstants.WHEEL_SPEED_INTAKE),
+    BACKTAKE(GooseneckConstants.WHEEL_SPEED_BACKTAKE),
     SCORE(GooseneckConstants.WHEEL_SPEED_SCORE),
     L1(GooseneckConstants.L1_SPEED_SCORE),
     ALGAE_IN(GooseneckConstants.ALGAE_WHEEL_SPEED),
@@ -82,6 +86,14 @@ public class GooseNeckWheels extends SubsystemBase {
     return currentState;
   }
 
+  public Current getTorqueCurrent(){
+    return wheelMotor.getTorqueCurrent().getValue();
+  }
+
+  public boolean holdingAlgae(){
+    return getTorqueCurrent().gte(GooseneckConstants.ALGAE_HOLD_CURRENT) ;
+  }
+
   public void stop(){
     wheelMotor.stopMotor();
   }
@@ -103,11 +115,20 @@ public class GooseNeckWheels extends SubsystemBase {
     return runOnce(()-> setState(WheelState.INTAKE));
   }
 
+  public Command backtake(){
+    return runOnce(()-> setState(WheelState.BACKTAKE));
+  }
+
   public Command l1(){
     return runOnce(()-> setState(WheelState.L1));
   }
 
   public Command score(){
     return runOnce(()-> setState(WheelState.SCORE));
+  }
+
+  /**Creates an infinite command attached to a state change by adding an infinite run command. */
+  public Command infiniteStateCommand(WheelState state){
+    return new InstantCommand(()-> setState(state), this).andThen(new RunCommand(()-> {}, this));
   }
 }
