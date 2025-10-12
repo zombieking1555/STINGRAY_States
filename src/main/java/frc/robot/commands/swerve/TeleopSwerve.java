@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotMap.SafetyMap.SwerveConstants;
 import frc.robot.subsystems.Elevator;
@@ -23,41 +22,41 @@ public class TeleopSwerve extends Command {
   private SlewRateLimiter xLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   private SlewRateLimiter yLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   
-  private Command driveNormal;
+  private SwerveRequest.FieldCentric driveNormal;
   
-  private Command driveSlow;
+  private SwerveRequest.FieldCentric driveSlow;
 
-  private Command driveSlew;
+  private SwerveRequest.FieldCentric driveSlew;
 
   private GenericEntry swerveCommandEntry;
   private String swerveCommandType = "NORMAL";
   private final ShuffleboardTab tab = Shuffleboard.getTab(getName());
 
-  /** Creates a new TeleopSwerve. */
+  /** Command used to control swerve in teleop. */
   public TeleopSwerve(CommandSwerveDrivetrain dt, Elevator elevator, CommandXboxController controller) {
     this.dt = dt;
     this.elevator = elevator;
 
-    driveNormal =  dt.applyRequest(()-> new SwerveRequest.FieldCentric()
+    driveNormal = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
     .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
     .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED)
     .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED)
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
 
-    driveSlow =  dt.applyRequest(()-> new SwerveRequest.FieldCentric()
+    driveSlow = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
     .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
     .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
     .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
 
-    driveSlew =  dt.applyRequest(()-> new SwerveRequest.FieldCentric()
+    driveSlew = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
     .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
     .withVelocityX(xLimiter.calculate(-controller.getLeftY() * SwerveConstants.MAX_SPEED))
     .withVelocityY(yLimiter.calculate(-controller.getLeftX() * SwerveConstants.MAX_SPEED))
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
 
     swerveCommandEntry= tab.add("Swerve Command Status", swerveCommandType).getEntry();
 
@@ -73,46 +72,34 @@ public class TeleopSwerve extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Command toSchedule = driveNormal;
 
     switch(elevator.getCurrentState()){
       case L4:
-        toSchedule = driveSlew;
+        dt.setControl(driveSlew);
         swerveCommandType = "SLEW";
         swerveCommandEntry.setString(swerveCommandType);
         break;
       case BARGE:
-        toSchedule = driveSlow;
+        dt.setControl(driveSlow);
         swerveCommandType = "SLOW";
         swerveCommandEntry.setString(swerveCommandType);
         break;
       default:
-        toSchedule = driveNormal;
+        dt.setControl(driveNormal);
         swerveCommandType = "NORMAL";
         swerveCommandEntry.setString(swerveCommandType);
         break;
     }
 
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-    if (!scheduler.isScheduled(toSchedule)) {
-      // cancel other drive variants (so only one holds the drivetrain)
-      if (scheduler.isScheduled(driveNormal) && driveNormal != toSchedule) scheduler.cancel(driveNormal);
-      if (scheduler.isScheduled(driveSlew) && driveSlew != toSchedule) scheduler.cancel(driveSlew);
-      if (scheduler.isScheduled(driveSlow) && driveSlow != toSchedule) scheduler.cancel(driveSlow);
-
-      scheduler.schedule(toSchedule);
+    
     }
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // swerveCommandType = "INACTIVE";
-    //     swerveCommandEntry.setString(swerveCommandType);
-    CommandScheduler scheduler = CommandScheduler.getInstance();
-  if (scheduler.isScheduled(driveNormal)) scheduler.cancel(driveNormal);
-  if (scheduler.isScheduled(driveSlew))  scheduler.cancel(driveSlew);
-  if (scheduler.isScheduled(driveSlow))  scheduler.cancel(driveSlow);
+    swerveCommandType = "INACTIVE";
+    swerveCommandEntry.setString(swerveCommandType);
   }
 
   // Returns true when the command should end.
