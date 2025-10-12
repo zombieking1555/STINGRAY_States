@@ -7,6 +7,9 @@ package frc.robot.commands.swerve;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,6 +28,10 @@ public class TeleopSwerve extends Command {
   private Command driveSlow;
 
   private Command driveSlew;
+
+  private GenericEntry swerveCommandEntry;
+  private String swerveCommandType = "NORMAL";
+  private final ShuffleboardTab tab = Shuffleboard.getTab(getName());
 
   /** Creates a new TeleopSwerve. */
   public TeleopSwerve(CommandSwerveDrivetrain dt, Elevator elevator, CommandXboxController controller) {
@@ -52,6 +59,8 @@ public class TeleopSwerve extends Command {
     .withVelocityY(yLimiter.calculate(-controller.getLeftX() * SwerveConstants.MAX_SPEED))
     .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
 
+    swerveCommandEntry= tab.add("Swerve Command Status", swerveCommandType).getEntry();
+
     addRequirements(this.dt);
   }
 
@@ -69,12 +78,18 @@ public class TeleopSwerve extends Command {
     switch(elevator.getCurrentState()){
       case L4:
         toSchedule = driveSlew;
+        swerveCommandType = "SLEW";
+        swerveCommandEntry.setString(swerveCommandType);
         break;
       case BARGE:
         toSchedule = driveSlow;
+        swerveCommandType = "SLOW";
+        swerveCommandEntry.setString(swerveCommandType);
         break;
       default:
         toSchedule = driveNormal;
+        swerveCommandType = "NORMAL";
+        swerveCommandEntry.setString(swerveCommandType);
         break;
     }
 
@@ -92,6 +107,8 @@ public class TeleopSwerve extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // swerveCommandType = "INACTIVE";
+    //     swerveCommandEntry.setString(swerveCommandType);
     CommandScheduler scheduler = CommandScheduler.getInstance();
   if (scheduler.isScheduled(driveNormal)) scheduler.cancel(driveNormal);
   if (scheduler.isScheduled(driveSlew))  scheduler.cancel(driveSlew);

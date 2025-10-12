@@ -35,8 +35,8 @@ public class RobotMap {
         public static class SwerveConstants {
             public static final double MAX_SPEED = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
             public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(2).in(RadiansPerSecond);
-            public static final double L4_SLEW_RATE = 1.5;
-            public static final double BARGE_SPEED_MULTIPLIER = 0.07;
+            public static final double L4_SLEW_RATE = 3;
+            public static final double BARGE_SPEED_MULTIPLIER = 0.15;
         }
     }
 

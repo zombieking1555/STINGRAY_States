@@ -6,12 +6,12 @@ package frc.robot;
 
 import java.util.Set;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotMap.SafetyMap.SwerveConstants;
@@ -29,22 +29,30 @@ import frc.robot.subsystems.swerve.generated.TunerConstants;
 
 public class RobotContainer {
 private CommandXboxController driverController = new CommandXboxController(0);
+private CommandXboxController simController = new CommandXboxController(4);
 private Elevator elevator = new Elevator();
 private GooseNeck gooseNeck = new GooseNeck();
 private GooseNeckWheels gooseNeckWheels = new GooseNeckWheels();
 private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
   public RobotContainer() {
-    configureBindings();
+    if(Robot.isSimulation()) configureSimControllerBindings();
+    else configureBindings();
     drivetrain.registerTelemetry(telemetry::telemeterize);
   }
 
   private void configureBindings() {
     drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, driverController));
+   
+    // Align to right pole
+    driverController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain)))
+    // Do nothing command to interrupt the alignment swerve request (returning to default command swerve control)
+        .onFalse(new InstantCommand(()->{}, drivetrain));
 
-    driverController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain))).onFalse(new InstantCommand(()->{}, drivetrain));
-
-    driverController.leftBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.LEFT, drivetrain), Set.of(drivetrain))).onFalse(new InstantCommand(()->{}, drivetrain));
+    // Align to left pole
+    driverController.leftBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.LEFT, drivetrain), Set.of(drivetrain)))
+    // Do nothing command to interrupt the alignment swerve request (returning to default command swerve control)
+        .onFalse(new InstantCommand(()->{}, drivetrain));
     
     // If Robot is in a state to pick up algae, spin wheels to intake an algae on press
     driverController.leftTrigger().and(elevator::isReefAlgaeState)
@@ -92,6 +100,27 @@ private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
         .onTrue(gooseNeck.moveToStateCommand(NeckState.BARGE_ANGLE)
             .andThen(elevator.moveToStateCommand(ElevatorState.BARGE)));
     
+  }
+
+  public void configureSimControllerBindings(){
+    drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, simController));
+    // Align to right pole
+    simController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain)))
+    // Do nothing command to interrupt the alignment swerve request (returning to default command swerve control)
+        .onFalse(new InstantCommand(()->{}, drivetrain));
+
+    // Align to left pole
+    simController.leftBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.LEFT, drivetrain), Set.of(drivetrain)))
+    // Do nothing command to interrupt the alignment swerve request (returning to default command swerve control)
+        .onFalse(new InstantCommand(()->{}, drivetrain));
+    
+    // Set elevator to barge state
+    simController.y().onTrue(elevator.barge());
+    // Set elevator to l4 state
+    simController.b().onTrue(elevator.l4());
+    // Set elevator to stow state
+    simController.x().onTrue(elevator.stow());
+
   }
 
   public Command getAutonomousCommand() {
