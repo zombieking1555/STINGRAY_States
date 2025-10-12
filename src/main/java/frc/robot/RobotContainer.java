@@ -4,13 +4,20 @@
 
 package frc.robot;
 
+import java.util.Set;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotMap.SafetyMap.SwerveConstants;
 import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.posePathfindToReef;
+import frc.robot.commands.swerve.posePathfindToReef.reefPole;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.GooseNeck;
 import frc.robot.subsystems.GooseNeckWheels;
@@ -34,6 +41,10 @@ private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
 
   private void configureBindings() {
     drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, driverController));
+
+    driverController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain))).onFalse(new InstantCommand(()->{}, drivetrain));
+
+    driverController.leftBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.LEFT, drivetrain), Set.of(drivetrain))).onFalse(new InstantCommand(()->{}, drivetrain));
     
     // If Robot is in a state to pick up algae, spin wheels to intake an algae on press
     driverController.leftTrigger().and(elevator::isReefAlgaeState)
