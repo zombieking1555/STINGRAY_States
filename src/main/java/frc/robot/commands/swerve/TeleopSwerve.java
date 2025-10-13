@@ -19,6 +19,7 @@ import frc.robot.subsystems.swerve.CommandSwerveDrivetrain;
 public class TeleopSwerve extends Command {
   private CommandSwerveDrivetrain dt;
   private Elevator elevator;
+  private CommandXboxController controller;
   private SlewRateLimiter xLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   private SlewRateLimiter yLimiter = new SlewRateLimiter(SwerveConstants.L4_SLEW_RATE);
   
@@ -36,27 +37,21 @@ public class TeleopSwerve extends Command {
   public TeleopSwerve(CommandSwerveDrivetrain dt, Elevator elevator, CommandXboxController controller) {
     this.dt = dt;
     this.elevator = elevator;
+    this.controller = controller;
 
     driveNormal = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
-    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
-    .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED)
-    .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED)
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
+    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07);
+    
 
     driveSlow = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
-    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
-    .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
-    .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
+    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07);
+    
 
     driveSlew = new SwerveRequest.FieldCentric()
     .withDeadband(SwerveConstants.MAX_SPEED*.07)
-    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07)
-    .withVelocityX(xLimiter.calculate(-controller.getLeftY() * SwerveConstants.MAX_SPEED))
-    .withVelocityY(yLimiter.calculate(-controller.getLeftX() * SwerveConstants.MAX_SPEED))
-    .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE);
+    .withRotationalDeadband(SwerveConstants.MAX_ANGULAR_RATE*.07);
 
     swerveCommandEntry= tab.add("Swerve Command Status", swerveCommandType).getEntry();
 
@@ -75,17 +70,31 @@ public class TeleopSwerve extends Command {
 
     switch(elevator.getCurrentState()){
       case L4:
-        dt.setControl(driveSlew);
+        dt.setControl(driveSlew
+        .withVelocityX(xLimiter.calculate(-controller.getLeftY() * SwerveConstants.MAX_SPEED))
+        .withVelocityY(yLimiter.calculate(-controller.getLeftX() * SwerveConstants.MAX_SPEED))
+        .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+
         swerveCommandType = "SLEW";
         swerveCommandEntry.setString(swerveCommandType);
+
         break;
       case BARGE:
-        dt.setControl(driveSlow);
+        dt.setControl(driveSlow
+        .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
+        .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED * SwerveConstants.BARGE_SPEED_MULTIPLIER)
+        .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+
         swerveCommandType = "SLOW";
         swerveCommandEntry.setString(swerveCommandType);
+
         break;
       default:
-        dt.setControl(driveNormal);
+        dt.setControl(driveNormal
+        .withVelocityX(-controller.getLeftY() * SwerveConstants.MAX_SPEED)
+        .withVelocityY(-controller.getLeftX() * SwerveConstants.MAX_SPEED)
+        .withRotationalRate(-controller.getRightX() * SwerveConstants.MAX_ANGULAR_RATE));
+
         swerveCommandType = "NORMAL";
         swerveCommandEntry.setString(swerveCommandType);
         break;

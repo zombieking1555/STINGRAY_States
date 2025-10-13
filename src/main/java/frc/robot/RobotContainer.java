@@ -6,7 +6,6 @@ package frc.robot;
 
 import java.util.Set;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -26,6 +25,8 @@ import frc.robot.subsystems.GooseNeck.NeckState;
 import frc.robot.subsystems.GooseNeckWheels.WheelState;
 import frc.robot.subsystems.swerve.CommandSwerveDrivetrain;
 import frc.robot.subsystems.swerve.generated.TunerConstants;
+import frc.robot.subsystems.vision.limelightAT;
+import frc.robot.utils.LimelightPoseEstimate;
 
 public class RobotContainer {
 private CommandXboxController driverController = new CommandXboxController(0);
@@ -33,6 +34,7 @@ private CommandXboxController simController = new CommandXboxController(4);
 private Elevator elevator = new Elevator();
 private GooseNeck gooseNeck = new GooseNeck();
 private GooseNeckWheels gooseNeckWheels = new GooseNeckWheels();
+private limelightAT limelight1 = new limelightAT("limelight1");
 private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
   public RobotContainer() {
@@ -102,7 +104,7 @@ private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
     
   }
 
-  public void configureSimControllerBindings(){
+  private void configureSimControllerBindings(){
     drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, simController));
     // Align to right pole
     simController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain)))
@@ -121,6 +123,16 @@ private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
     // Set elevator to stow state
     simController.x().onTrue(elevator.stow());
 
+  }
+
+  /**
+   * Method used to manage the addition of vision measurements to the robot's odometry pose.
+   * @apiNote Should be called periodically (See Robot.java).
+   */
+  public void manageVisionMeasurements(){
+    limelight1.SetRobotOrientation(drivetrain.getState());
+    LimelightPoseEstimate poseLL1 = limelight1.getRobotPose(true);
+    if(limelight1.isPoseOk(poseLL1, drivetrain.getState())) drivetrain.addVisionMeasurement(poseLL1.getPose(), poseLL1.getTime());
   }
 
   public Command getAutonomousCommand() {

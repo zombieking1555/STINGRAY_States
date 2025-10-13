@@ -21,6 +21,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    m_robotContainer.manageVisionMeasurements();
     CommandScheduler.getInstance().run();
     SmartDashboard.putData(CommandScheduler.getInstance());
     if (Robot.isSimulation()) {
