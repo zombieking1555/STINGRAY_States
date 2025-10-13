@@ -26,6 +26,7 @@ import frc.robot.subsystems.GooseNeckWheels.WheelState;
 import frc.robot.subsystems.swerve.CommandSwerveDrivetrain;
 import frc.robot.subsystems.swerve.generated.TunerConstants;
 import frc.robot.subsystems.vision.limelightAT;
+import frc.robot.subsystems.vision.limelightAT.LEDState;
 import frc.robot.utils.LimelightPoseEstimate;
 
 public class RobotContainer {
@@ -34,7 +35,7 @@ private CommandXboxController simController = new CommandXboxController(4);
 private Elevator elevator = new Elevator();
 private GooseNeck gooseNeck = new GooseNeck();
 private GooseNeckWheels gooseNeckWheels = new GooseNeckWheels();
-private limelightAT limelight1 = new limelightAT("limelight1");
+private limelightAT limelight1 = new limelightAT("limelight1", LEDState.OFF);
 private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
   public RobotContainer() {
@@ -130,7 +131,7 @@ private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
    * @apiNote Should be called periodically (See Robot.java).
    */
   public void manageVisionMeasurements(){
-    limelight1.SetRobotOrientation(drivetrain.getState());
+    limelight1.setRobotOrientation(drivetrain.getState());
     LimelightPoseEstimate poseLL1 = limelight1.getRobotPose(true);
     if(limelight1.isPoseOk(poseLL1, drivetrain.getState())) drivetrain.addVisionMeasurement(poseLL1.getPose(), poseLL1.getTime());
   }
