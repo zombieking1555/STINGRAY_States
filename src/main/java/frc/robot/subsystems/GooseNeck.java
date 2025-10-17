@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.GooseneckConstants;
+import frc.robot.utils.SubsystemStatusManager;
 
 public class GooseNeck extends SubsystemBase {
 
@@ -86,6 +87,8 @@ public class GooseNeck extends SubsystemBase {
     positionEntry = tab.add("GooseNeck Position", 0.0).getEntry();
     stateEntry = tab.add("GooseNeck State", getCurrentState().name()).getEntry();
     atTargetEntry = tab.add("GooseNeck At Target", isAtTarget()).getEntry();
+
+    SubsystemStatusManager.addSubsystem(getName(), ()-> neckPivot.isConnected());
 }
 
 @Override

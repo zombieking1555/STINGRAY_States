@@ -60,8 +60,13 @@ public class limelightAT {
     public LimelightPoseEstimate getRobotPose(boolean isMetatag2) {
         LimelightHelpers.PoseEstimate pose = LimelightHelpers.getBotPoseEstimate(llName, "botpose_orb_wpiblue",
                 isMetatag2);
+        if(pose!=null){
         double time = pose.timestampSeconds;
+        
         return new LimelightPoseEstimate(pose, time);
+        } else {
+            return null;
+        }
     }
 
     /**

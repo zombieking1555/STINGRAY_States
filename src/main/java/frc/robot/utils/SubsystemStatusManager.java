@@ -1,0 +1,75 @@
+package frc.robot.utils;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BooleanSupplier;
+
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.GenericEntry;
+
+/**
+ * - Register boolean suppliers with addSubsystemSafety(name, supplier)
+ * - Call pollAll() from robotPeriodic() to update Shuffleboard and cached status
+ */
+public final class SubsystemStatusManager {
+    private static final ShuffleboardTab tab = Shuffleboard.getTab("Status Manager");
+
+    private static final Map<String, BooleanSupplier> suppliers = new LinkedHashMap<>();
+    private static final Map<String, Boolean> lastStatus = new LinkedHashMap<>();
+    private static final Map<String, GenericEntry> entries = new LinkedHashMap<>();
+
+    private SubsystemStatusManager() {}
+    
+    /**
+     * Register a boolean supplier for a subsystem / device group.
+     */
+    public static synchronized void addSubsystem(String name, BooleanSupplier statusSupplier) {
+        if (name == null || statusSupplier == null) {
+            throw new IllegalArgumentException("name and statusSupplier must be non-null");
+        }
+        if (suppliers.containsKey(name)) {
+            System.err.println("[SubsystemStatusManager] Warning: subsystem '" + name + "' already registered; ignoring duplicate.");
+            return;
+        }
+        suppliers.put(name, statusSupplier);
+        lastStatus.put(name, false); // default before first poll
+        entries.put(name, tab.add(name, false).getEntry());
+    }
+
+    /**
+     * Poll all registered suppliers, update Shuffleboard and cached values.
+     * Call this from Robot.robotPeriodic().
+     */
+    public static synchronized void pollAll() {
+        for (Map.Entry<String, BooleanSupplier> e : suppliers.entrySet()) {
+            final String name = e.getKey();
+            boolean ok;
+            try {
+                ok = e.getValue().getAsBoolean();
+            } catch (Throwable t) {
+                ok = false;
+                System.err.println("[SubsystemStatusManager] Exception while polling '" + name + "': " + t.getMessage());
+            }
+            lastStatus.put(name, ok);
+            GenericEntry entry = entries.get(name);
+            if (entry != null) entry.setBoolean(ok);
+        }
+    }
+
+
+    /** Returns true if every registered subsystem's last known status is true. */
+    public static synchronized boolean isAllOk() {
+        for (Boolean val : lastStatus.values()) {
+            if (!Boolean.TRUE.equals(val)) return false;
+        }
+        return true;
+    }
+
+    /** Clears all registrations */
+    public static synchronized void clearAll() {
+        suppliers.clear();
+        lastStatus.clear();
+        entries.clear();
+    }
+}
