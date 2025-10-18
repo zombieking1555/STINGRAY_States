@@ -60,7 +60,7 @@ public class GooseNeckWheels extends SubsystemBase {
     }
     stateEntry = tab.add("GooseNeck Wheels State", getCurrentState().name()).getEntry();
     
-    SubsystemStatusManager.addSubsystem(getName(), ()-> coralRange.isConnected() && wheelMotor.isConnected());
+    SubsystemStatusManager.addSubsystem(getName(), coralRange, wheelMotor);
   }
 
   @Override

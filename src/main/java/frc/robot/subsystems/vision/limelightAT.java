@@ -4,8 +4,10 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.LimelightPoseEstimate;
+import frc.robot.utils.SubsystemStatusManager;
 
 /**
  * Limelight object to represent an aprilTag-measuring limelight.
@@ -32,6 +34,7 @@ public class limelightAT {
     public limelightAT(String llName, LEDState defaultLEDState) {
         this.llName = llName;
         setLEDState(defaultLEDState);
+        SubsystemStatusManager.addSubsystem(llName, ()-> NetworkTableInstance.getDefault().getTable(llName).getTopic("tv").exists());
     }
 
     /**

@@ -98,7 +98,7 @@ public class Elevator extends SubsystemBase {
       stateEntry = tab.add("elevatorState", getCurrentState().name()).getEntry();
       atTargetEntry = tab.add("elevatorAtTarget", isAtTarget()).getEntry();
 
-      SubsystemStatusManager.addSubsystem(getName(), ()-> elevatorLeader.isConnected() && elevatorFollower.isConnected());
+      SubsystemStatusManager.addSubsystem(getName(), elevatorLeader, elevatorFollower);
   }
 
   @Override

@@ -88,7 +88,7 @@ public class GooseNeck extends SubsystemBase {
     stateEntry = tab.add("GooseNeck State", getCurrentState().name()).getEntry();
     atTargetEntry = tab.add("GooseNeck At Target", isAtTarget()).getEntry();
 
-    SubsystemStatusManager.addSubsystem(getName(), ()-> neckPivot.isConnected());
+    SubsystemStatusManager.addSubsystem(getName(), neckPivot);
 }
 
 @Override

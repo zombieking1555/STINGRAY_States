@@ -1,12 +1,22 @@
 package frc.robot.utils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.CANdi;
+import com.ctre.phoenix6.hardware.CANrange;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.units.measure.Temperature;
 
 /**
  * - Register boolean suppliers with addSubsystemSafety(name, supplier)
@@ -35,6 +45,41 @@ public final class SubsystemStatusManager {
         suppliers.put(name, statusSupplier);
         lastStatus.put(name, false); // default before first poll
         entries.put(name, tab.add(name, false).getEntry());
+    }
+
+     
+     public static synchronized void addSubsystem(String name, ParentDevice... devices) {
+        if (name == null || devices == null) {
+            throw new IllegalArgumentException("name and devices must be non-null");
+        }
+
+        List<TalonFX> talons = new ArrayList<>();
+        List<CANrange> canRanges = new ArrayList<>();
+        List<CANcoder> canCoders = new ArrayList<>();
+        List<Pigeon2> pigeons = new ArrayList<>(); //No implementation yet
+        List<CANdi> candis = new ArrayList<>(); //No implementation yet
+
+
+        for(ParentDevice d : devices){
+            if(d instanceof TalonFX) talons.add((TalonFX) d);
+            else if(d instanceof CANrange) canRanges.add((CANrange) d);
+            else if(d instanceof CANcoder) canCoders.add((CANcoder) d);
+            else if(d instanceof Pigeon2) pigeons.add((Pigeon2) d);
+            else if(d instanceof CANdi) candis.add((CANdi) d);
+        }
+
+        BooleanSupplier connectionSupplier = () -> {
+            for (ParentDevice d : devices) {
+                if (d == null) break;
+                if (!d.isConnected()) {
+                        return false;
+                }
+            }
+            return true;
+        };
+
+        // delegate to the boolean-supplier registration
+        addSubsystem(name, connectionSupplier);
     }
 
     /**
