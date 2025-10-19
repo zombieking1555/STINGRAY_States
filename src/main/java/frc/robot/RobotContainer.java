@@ -6,6 +6,9 @@ package frc.robot;
 
 import java.util.Set;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -39,10 +42,17 @@ private GooseNeckWheels gooseNeckWheels = new GooseNeckWheels();
 private limelightAT limelight1 = new limelightAT("limelight1", LEDState.OFF);
 private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
+private SendableChooser<Command> autonChooser;
   public RobotContainer() {
     if(Robot.isSimulation()) configureSimControllerBindings();
     else configureBindings();
     drivetrain.registerTelemetry(telemetry::telemeterize);
+    boolean isCompetition = true;
+    autonChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+        (stream) -> isCompetition
+          ? stream.filter(auto -> auto.getName().startsWith("comp"))
+          : stream
+      );
   }
 
   private void configureBindings() {

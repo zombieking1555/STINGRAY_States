@@ -70,9 +70,21 @@ public final class SubsystemStatusManager {
 
         BooleanSupplier connectionSupplier = () -> {
             for (ParentDevice d : devices) {
-                if (d == null) break;
-                if (!d.isConnected()) {
+                if (d != null){ 
+                    if (!d.isConnected()) {
                         return false;
+                    }
+                }
+            }
+            return true;
+        };
+
+        BooleanSupplier tempSupplier = ()-> {
+            for (TalonFX t : talons) {
+                if(t != null){
+                    if(t.getDeviceTemp().getValueAsDouble() > 100){
+                        return false;
+                    }
                 }
             }
             return true;
