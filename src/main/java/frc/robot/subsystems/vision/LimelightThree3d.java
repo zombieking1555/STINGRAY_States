@@ -3,48 +3,17 @@ package frc.robot.subsystems.vision;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.LimelightPoseEstimate;
-import frc.robot.utils.SubsystemStatusManager;
 
 /**
  * Limelight object to represent an aprilTag-measuring limelight.
  */
-public class limelightAT {
-    public enum LEDState {
-        OFF(1),
-        BLINK(2),
-        ON(3);
-
-        private int mode;
-
-        private LEDState(int mode) {
-            this.mode = mode;
-        }
-
-        public int getLEDMode() {
-            return mode;
-        }
-    }
-
+public class LimelightThree3d extends LimelightThreeBase{
     private String llName;
 
-    public limelightAT(String llName, LEDState defaultLEDState) {
-        this.llName = llName;
-        setLEDState(defaultLEDState);
-        SubsystemStatusManager.addSubsystem(llName, ()-> NetworkTableInstance.getDefault().getTable(llName).getTopic("tv").exists());
-    }
-
-    /**
-     * Method used to retrieve a networktable value from this limelight.
-     * 
-     * @param entryName The name of the entry to rethrn
-     * @return The entry to return
-     */
-    public NetworkTableEntry getNetworkTableEntry(String entryName) {
-        return LimelightHelpers.getLimelightNTTableEntry(llName, entryName);
+    public LimelightThree3d(String llName, LEDState defaultLEDState) {
+       super(llName, defaultLEDState);
     }
 
     /**
@@ -94,14 +63,5 @@ public class limelightAT {
      */
     public void setRobotOrientation(SwerveDriveState dtState) {
         LimelightHelpers.SetRobotOrientation(llName, dtState.Pose.getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    }
-
-    /**
-     * Sets the state of the limelight LEDs.
-     * 
-     * @param state The state to set the LEDs to
-     */
-    public void setLEDState(LEDState state) {
-        LimelightHelpers.setLimelightNTDouble(llName, "ledMode", state.getLEDMode());
     }
 }

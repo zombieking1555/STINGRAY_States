@@ -30,9 +30,13 @@ public class Elevator extends SubsystemBase {
   public enum ElevatorState {
 
     STOW(Rotations.of(ElevatorMap.ELEVATOR_LIMIT_SWITCH_HEIGHT)),
+    //This works kinda like a key and gives it proprityes
     ALGAE_GROUND(Rotations.of(ElevatorMap.ALGAE_GROUND_INTAKE_ROTATION)),
+    //There are constructos right next to the thing
     CORAL_INTAKE(Rotations.of(ElevatorMap.CORAL_INTAKE_ROTATION)),
     L1(Rotations.of(ElevatorMap.L1ROTATION)),
+    //Rotations.of is taking the distance from 0 to L1
+    //Syntax = item()
     L2(Rotations.of(ElevatorMap.L2ROTATION)),
     L3(Rotations.of(ElevatorMap.L3ROTATION)),
     L4(Rotations.of(ElevatorMap.L4ROTATION)),
@@ -166,9 +170,9 @@ public class Elevator extends SubsystemBase {
     return elevatorLeader.isConnected() && elevatorFollower.isConnected();
   }
 
-
 public Command stow(){
   return runOnce(()-> setState(ElevatorState.STOW));
+  //()-> just means that it is runable
 }
 public Command coralIntake(){
   return runOnce(()-> setState(ElevatorState.CORAL_INTAKE));

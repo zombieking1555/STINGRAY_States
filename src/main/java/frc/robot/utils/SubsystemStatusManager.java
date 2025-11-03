@@ -16,7 +16,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.units.measure.Temperature;
 
 /**
  * - Register boolean suppliers with addSubsystemSafety(name, supplier)
