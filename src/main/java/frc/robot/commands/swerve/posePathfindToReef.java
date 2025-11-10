@@ -11,13 +11,10 @@ import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.RobotMap.AutonPosesMap;
 import frc.robot.RobotMap.BlueReefTagLocations;
 import frc.robot.RobotMap.RedReefTagLocations;
@@ -33,7 +30,6 @@ public class posePathfindToReef extends Command {
   private List<Pose2d> reefSideTagPoses;
   private reefPole pole;
   private Pose2d tagPosefinal;
-  private boolean commandFinished;
   private Command alignCommand;
   private Pose2d poseName; 
   private CommandSwerveDrivetrain dt;
@@ -78,7 +74,6 @@ public class posePathfindToReef extends Command {
     tagPosefinal = dt.getState().Pose.nearest(reefSideTagPoses);
 
     if (tagPosefinal == null) {
-      commandFinished = true;
     } else {
 
     // Retrieve the Correct Pose Destination for Alignment.

@@ -49,5 +49,9 @@ public class TurretLimelight extends LimelightThreeBase{
     public Angle getTurretRotationError(){
       return Degrees.of(getNetworkTableEntry("ty").getDouble(0));
     }
+
+    public Angle getTurretArmRotationError(){
+      return Degrees.of(getNetworkTableEntry("tx").getDouble(0));
+    }
      
   }

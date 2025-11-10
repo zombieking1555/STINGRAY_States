@@ -78,16 +78,17 @@ public final class SubsystemStatusManager {
             return true;
         };
 
-        BooleanSupplier tempSupplier = ()-> {
-            for (TalonFX t : talons) {
-                if(t != null){
-                    if(t.getDeviceTemp().getValueAsDouble() > 100){
-                        return false;
-                    }
-                }
-            }
-            return true;
-        };
+        // Implementation Needed
+        // BooleanSupplier tempSupplier = ()-> {
+        //     for (TalonFX t : talons) {
+        //         if(t != null){
+        //             if(t.getDeviceTemp().getValueAsDouble() > 100){
+        //                 return false;
+        //             }
+        //         }
+        //     }
+        //     return true;
+        // };
 
         // delegate to the boolean-supplier registration
         addSubsystem(name, connectionSupplier);

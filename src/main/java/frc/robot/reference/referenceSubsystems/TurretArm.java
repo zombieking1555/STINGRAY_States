@@ -18,28 +18,25 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.reference.referenceSubsystems.Turret.TurretState;
 import frc.robot.utils.SubsystemStatusManager;
 
-public class Turret extends SubsystemBase {
-  /** Creates a new Turret. 
-   * Design notes:
-   * Turret with approx. 420 deg. Rotation
-   * Horizontally mounted limelight for apriltag tracking
-   * External Cancoder geared up to 1:1.25
-  */
-
-  public enum TurretState {
+public class TurretArm extends SubsystemBase {
+  public enum TurretArmState {
     HOME(Rotations.of(0)),
     TRACKING(),
-    UNWRAPPING();
+    IDLE();
 
     private Angle targetPos;
-    private TurretState(Angle targetPos){
+    private TurretArmState(Angle targetPos){
       this.targetPos = targetPos;
     }
 
-    private TurretState(){
-      targetPos = Rotations.of(0);
+    private TurretArmState(){
+      //target position of .25 rotations (Straight up)
+      //This value should not be accessed, as position 
+      //control of states without a preset setpoint should be managed in periodic().
+      targetPos = Rotations.of(.25);
     }
 
     public Angle getTargetPosition(){
@@ -47,26 +44,26 @@ public class Turret extends SubsystemBase {
     }
   }
 
-  private final TalonFX turretMotor = new TalonFX(1);
-  private final CANcoder turretEncoder = new CANcoder(2);
+
+  private final TalonFX turretArmMotor = new TalonFX(3);
+  private final CANcoder turretArmEncoder = new CANcoder(4);
   private final MotionMagicVoltage positionOut = new MotionMagicVoltage(Rotations.of(0));
   private final TurretLimelight limelight;
 
-  private TurretState currentState = TurretState.HOME;
+  private TurretArmState currentState = TurretArmState.HOME;
 
   private Angle currentPosition;
   private Angle positionError;
   private Angle targetPosition = Rotations.of(0);
-  private boolean inWrapCycle = false;
 
-  public Turret(TurretLimelight limelight) {
+  public TurretArm(TurretLimelight limelight) {
     this.limelight = limelight;
     CANcoderConfiguration cConfig = new CANcoderConfiguration();
     cConfig.MagnetSensor.MagnetOffset = 0; //Tune
     cConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0; //Tune
     // Apply config multiple times to ensure application
     for (int i = 0; i < 2; ++i){
-      var status = turretEncoder.getConfigurator().apply(cConfig);
+      var status = turretArmEncoder.getConfigurator().apply(cConfig);
       if(status.isOK()) break;
     }
 
@@ -74,9 +71,9 @@ public class Turret extends SubsystemBase {
     tConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     tConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     tConfig.CurrentLimits.StatorCurrentLimit = 0; //Tune
-    tConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    tConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-    tConfig.Feedback.FeedbackRemoteSensorID = turretEncoder.getDeviceID();
+    tConfig.Feedback.FeedbackRemoteSensorID = turretArmEncoder.getDeviceID();
     tConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     //tConfig.Feedback. either need to use RotorToSensor or SensorToMechanism, maybe both, not quite sure.
     //Following values would need to be tuned.
@@ -87,57 +84,45 @@ public class Turret extends SubsystemBase {
     tConfig.MotionMagic.MotionMagicAcceleration = 0.0; // Max allowed acceleration (Motor rot / sec^2)
     // Apply config multiple times to ensure application
     for (int j = 0; j < 2; ++j){
-      var status = turretMotor.getConfigurator().apply(tConfig);
+      var status = turretArmMotor.getConfigurator().apply(tConfig);
       if(status.isOK()) break;
     }
 
-    SubsystemStatusManager.addSubsystem(getName(), turretEncoder, turretMotor);
+    SubsystemStatusManager.addSubsystem(getName(), turretArmEncoder, turretArmMotor);
   }
 
   @Override
   public void periodic() {
-    currentPosition = getTurretAngle();
-    positionError = limelight.getTurretRotationError();
+    currentPosition = getTurretArmAngle();
+    positionError = limelight.getTurretArmRotationError();
    switch(currentState){
     case HOME: 
     setPosition(TurretState.HOME.getTargetPosition());
     break;
     case TRACKING:
-      if(currentPosition.plus(positionError).abs(Rotations) > 1.05){
-        setState(TurretState.UNWRAPPING);
+      if(targetPosition.gt(Rotations.of(0)) || targetPosition.lt(Rotations.of(.5))){
+        setState(TurretArmState.IDLE);
         break;
       } 
       setPosition(currentPosition.plus(positionError));
       break;
-    case UNWRAPPING:
-      if(!inWrapCycle){ 
-        if(getTurretAngle().gte(Rotations.of(0))){ 
-          setPosition(currentPosition.minus(Rotations.of(1)));
-        } else {
-          setPosition(currentPosition.plus(Rotations.of(1)));
-        }
-      }
-      inWrapCycle = true;
-
-      if(getTurretAtSetpoint()){
-        setState(TurretState.TRACKING);
-        inWrapCycle = false;
-      }
-      break;
+    case IDLE:
+      turretArmMotor.set(0);
+    break;
    }
    
   }
 
   public boolean getTurretAtSetpoint(){
-    return getTurretAngle().isNear(targetPosition, 0.015);
+    return getTurretArmAngle().isNear(targetPosition, 0.015);
   }
 
-  public Angle getTurretAngle(){
-    return turretMotor.getPosition().getValue();
+  public Angle getTurretArmAngle(){
+    return turretArmMotor.getPosition().getValue();
   }
 
   public void setPosition(Angle posAngle){
-    turretMotor.setControl(positionOut.withPosition(posAngle));
+    turretArmMotor.setControl(positionOut.withPosition(posAngle));
     targetPosition = posAngle;
   }
   
@@ -145,8 +130,7 @@ public class Turret extends SubsystemBase {
    * Enters a new state
    * @param state The state to enter
    */
-  public void setState(TurretState state){
+  public void setState(TurretArmState state){
     currentState = state;
-    setPosition(currentState.getTargetPosition());
   }
 }
