@@ -5,16 +5,24 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.subsystems.vision.LimelightThreeBase;
 
 public class TurretLimelight extends LimelightThreeBase{
     private final Distance groundToLimelightHeight = Inches.of(0);
+    //Horizontal distance between the limelight lens center and the center of the turret (Lines up with arm axis of rotation)
     private final Distance limelightToArmAORDistance = Inches.of(0);
+    //Vertical distance between the limelight lens center and the arms origin of rotation
     private final Distance limelightToArmAORHeight = Inches.of(0);
     private final Distance groundToAprilTagHeight = Feet.of(3);
     private final Distance aprilTagToTargetHeight = Feet.of(1);
+    private final Distance groundToTargetHeight = aprilTagToTargetHeight.plus(aprilTagToTargetHeight);
+    private final Distance groundToArmAORHeight = groundToLimelightHeight.plus(limelightToArmAORHeight);
+    private final Translation2d ArmAORToLimelightVector = new Translation2d(limelightToArmAORDistance, null);
   
   
     public TurretLimelight(String llName, LEDState defaultLEDState) {
@@ -32,13 +40,19 @@ public class TurretLimelight extends LimelightThreeBase{
       return limelightDistanceToAT.plus(limelightToArmAORDistance);
     }
   
+    @Override
+    public void periodic(){
+
+    }
+
+
     /**
      * Method to retrieve the desired arm angle setpoint so that it will point at the target
      * @return the desired setpoint
      */
     public Angle getArmToTargetAngle(){
       Distance armDistToATWall = getArmDistanceToATWall();
-      double theta = Math.atan((groundToAprilTagHeight.plus(aprilTagToTargetHeight)).minus(groundToLimelightHeight.plus(limelightToArmAORHeight)).div(armDistToATWall).magnitude());
+      double theta = Math.atan(groundToTargetHeight.minus(groundToArmAORHeight).div(armDistToATWall).magnitude());
       return Radians.of(theta);
     }
   

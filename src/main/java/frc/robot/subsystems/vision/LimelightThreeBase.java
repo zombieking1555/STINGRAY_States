@@ -4,10 +4,11 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.SubsystemStatusManager;
 
-public class LimelightThreeBase {
+public class LimelightThreeBase extends SubsystemBase {
     public enum LEDState {
         OFF(1),
         BLINK(2),
