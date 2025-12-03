@@ -16,11 +16,13 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.reference.referenceSubsystems.Turret.TurretState;
 import frc.robot.utils.SubsystemStatusManager;
 
+@Logged
 public class TurretArm extends SubsystemBase {
   public enum TurretArmState {
     HOME(Rotations.of(0)),
