@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.ElevatorMap;
+import frc.robot.utils.DeviceTempReporter;
 import frc.robot.utils.SubsystemStatusManager;
 
 public class Elevator extends SubsystemBase {
@@ -103,6 +104,7 @@ public class Elevator extends SubsystemBase {
       atTargetEntry = tab.add("elevatorAtTarget", isAtTarget()).getEntry();
 
       SubsystemStatusManager.addSubsystem(getName(), elevatorLeader, elevatorFollower);
+      DeviceTempReporter.addDevices(elevatorFollower, elevatorLeader);
   }
 
   @Override

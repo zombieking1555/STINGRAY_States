@@ -5,35 +5,45 @@ import static edu.wpi.first.units.Units.Celsius;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.DeviceTempReporter;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.utils.SubsystemStatusManager;
 
-public class LimelightThreeBase extends SubsystemBase {
-    public enum LEDState {
-        OFF(1),
-        BLINK(2),
-        ON(3);
+public class LimelightFourBase extends SubsystemBase {
+    /**
+     * States corresponding to the IMU mode of the Limelight
+     */
+    public enum IMUState {
+        EXTERNAL(0),
+        EXTERNAL_SEED_INTERNAL(2),
+        INTERNAL(2),
+        INTERNAL_MT1_CONVERGE(3),
+        INTERNAL_EXTERNAL_CONVERGE(4);
 
         private int mode;
 
-        private LEDState(int mode) {
+        private IMUState(int mode) {
             this.mode = mode;
         }
 
-        public int getLEDMode() {
+        public int getIMUMode() {
             return mode;
         }
     }
 
     private String llName;
+    private IMUState currentState;
+    private ShuffleboardTab llTab = Shuffleboard.getTab("limelight");
 
-    public LimelightThreeBase(String llName, LEDState defaultLEDState) {
+    public LimelightFourBase(String llName, IMUState defaultIMUState) {
          this.llName = llName;
-        setLEDState(defaultLEDState);
+        setIMUState(defaultIMUState);
+        currentState = defaultIMUState;
+
+        llTab.addString(llName + " State", ()-> getIMUState().name());
         SubsystemStatusManager.addSubsystem(llName, ()-> NetworkTableInstance.getDefault().getTable(llName).getTopic("tv").exists());
         DeviceTempReporter.addDevice(llName, ()->getDeviceTemp());
     }
@@ -57,22 +67,18 @@ public class LimelightThreeBase extends SubsystemBase {
         double temp = NetworkTableInstance.getDefault().getTable(llName).getEntry("hw").getDoubleArray(new double[4])[3];
         return Celsius.of(temp); //Celsius is a guess. i dont know what unit it actually is.
     }
-
+    
     /**
      * Sets the state of the limelight LEDs.
      * 
      * @param state The state to set the LEDs to
      */
-    public void setLEDState(LEDState state) {
-        LimelightHelpers.setLimelightNTDouble(llName, "ledMode", state.getLEDMode());
+    public void setIMUState(IMUState state) {
+        currentState = state;
+        LimelightHelpers.setLimelightNTDouble(llName, "imumode_set", state.getIMUMode());
     }
 
-    /**
-     * Blink the LEDs of the Limelight 3
-     * @param seconds Seconds of blink time
-     * @return The LED blink command
-     */
-    public Command blinkLEDs(double seconds){
-        return new StartEndCommand(()-> setLEDState(LEDState.BLINK), ()-> setLEDState(LEDState.OFF)).withTimeout(seconds);
+    public IMUState getIMUState(){
+        return currentState;
     }
 }

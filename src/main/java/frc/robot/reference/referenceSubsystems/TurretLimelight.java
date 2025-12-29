@@ -5,9 +5,6 @@ import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.subsystems.vision.LimelightThreeBase;
@@ -22,7 +19,6 @@ public class TurretLimelight extends LimelightThreeBase{
     private final Distance aprilTagToTargetHeight = Feet.of(1);
     private final Distance groundToTargetHeight = aprilTagToTargetHeight.plus(aprilTagToTargetHeight);
     private final Distance groundToArmAORHeight = groundToLimelightHeight.plus(limelightToArmAORHeight);
-    private final Translation2d ArmAORToLimelightVector = new Translation2d(limelightToArmAORDistance, null);
   
   
     public TurretLimelight(String llName, LEDState defaultLEDState) {

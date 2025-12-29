@@ -28,6 +28,12 @@ public final class SubsystemStatusManager {
     private static final Map<String, Boolean> lastStatus = new LinkedHashMap<>();
     private static final Map<String, GenericEntry> entries = new LinkedHashMap<>();
 
+    private static List<CANrange> canRanges = new ArrayList<>();
+    private static List<TalonFX> talons = new ArrayList<>();
+    private static List<CANcoder> canCoders = new ArrayList<>();
+    private static List<Pigeon2> pigeons = new ArrayList<>(); 
+    private static List<CANdi> candis = new ArrayList<>(); 
+
     private SubsystemStatusManager() {}
     
     /**
@@ -52,13 +58,6 @@ public final class SubsystemStatusManager {
             throw new IllegalArgumentException("name and devices must be non-null");
         }
 
-        List<TalonFX> talons = new ArrayList<>();
-        List<CANrange> canRanges = new ArrayList<>();
-        List<CANcoder> canCoders = new ArrayList<>();
-        List<Pigeon2> pigeons = new ArrayList<>(); //No implementation yet
-        List<CANdi> candis = new ArrayList<>(); //No implementation yet
-
-
         for(ParentDevice d : devices){
             if(d instanceof TalonFX) talons.add((TalonFX) d);
             else if(d instanceof CANrange) canRanges.add((CANrange) d);
@@ -71,6 +70,7 @@ public final class SubsystemStatusManager {
             for (ParentDevice d : devices) {
                 if (d != null){ 
                     if (!d.isConnected()) {
+                        tab.addNumber(name + " Disconnect ID", ()-> d.getDeviceID());
                         return false;
                     }
                 }

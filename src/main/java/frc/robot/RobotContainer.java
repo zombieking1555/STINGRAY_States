@@ -20,6 +20,9 @@ import frc.robot.RobotMap.SafetyMap.SwerveConstants;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.posePathfindToReef;
 import frc.robot.commands.swerve.posePathfindToReef.reefPole;
+import frc.robot.reference.referenceSubsystems.Turret;
+import frc.robot.reference.referenceSubsystems.TurretArm;
+import frc.robot.reference.referenceSubsystems.TurretLimelight;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorState;
 import frc.robot.subsystems.GooseNeck;
@@ -38,6 +41,9 @@ private CommandXboxController simController = new CommandXboxController(4);
 private Elevator elevator = new Elevator();
 private GooseNeck gooseNeck = new GooseNeck();
 private GooseNeckWheels gooseNeckWheels = new GooseNeckWheels();
+private TurretLimelight turretLimelight = new TurretLimelight("limelightTurret", LEDState.ON);
+private Turret turret = new Turret(turretLimelight);
+private TurretArm turretArm = new TurretArm(turretLimelight);
 private LimelightThree3d limelight1 = new LimelightThree3d("limelight1", LEDState.OFF);
 private LimelightThree3d limelight2 = new LimelightThree3d("limelight2", LEDState.OFF);
 private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -62,7 +68,7 @@ private SendableChooser<Command> autonChooser;
         .onTrue(limelight1.blinkLEDs(.75)
             .alongWith(limelight2.blinkLEDs(.75)));
 
-    drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, driverController));
+    drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, driverController));
    
     // Align to right pole
     driverController.rightBumper().and(gooseNeckWheels::getCoralSeen)
@@ -168,7 +174,7 @@ private SendableChooser<Command> autonChooser;
   }
 
   private void configureSimControllerBindings(){
-    drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, elevator, simController));
+    drivetrain.setDefaultCommand(new TeleopSwerve(drivetrain, simController));
     // Align to right pole
     simController.rightBumper().whileTrue(new DeferredCommand(()-> new posePathfindToReef(reefPole.RIGHT, drivetrain), Set.of(drivetrain)))
     // Do nothing command to interrupt the alignment swerve request (returning to default command swerve control)

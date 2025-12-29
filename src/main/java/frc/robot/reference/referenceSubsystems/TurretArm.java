@@ -20,6 +20,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.reference.referenceSubsystems.Turret.TurretState;
+import frc.robot.utils.DeviceTempReporter;
 import frc.robot.utils.SubsystemStatusManager;
 
 @Logged
@@ -91,6 +92,7 @@ public class TurretArm extends SubsystemBase {
     }
 
     SubsystemStatusManager.addSubsystem(getName(), turretArmEncoder, turretArmMotor);
+    DeviceTempReporter.addDevices(turretArmMotor);
   }
 
   @Override

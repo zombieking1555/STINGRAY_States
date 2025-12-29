@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.GooseneckConstants;
+import frc.robot.utils.DeviceTempReporter;
 import frc.robot.utils.SubsystemStatusManager;
 
 public class GooseNeckWheels extends SubsystemBase {
@@ -61,6 +62,7 @@ public class GooseNeckWheels extends SubsystemBase {
     stateEntry = tab.add("GooseNeck Wheels State", getCurrentState().name()).getEntry();
     
     SubsystemStatusManager.addSubsystem(getName(), coralRange, wheelMotor);
+    DeviceTempReporter.addDevices(wheelMotor);
   }
 
   @Override

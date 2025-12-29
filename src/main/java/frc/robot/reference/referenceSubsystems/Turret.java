@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.DeviceTempReporter;
 import frc.robot.utils.SubsystemStatusManager;
 
 @Logged
@@ -94,6 +95,7 @@ public class Turret extends SubsystemBase {
     }
 
     SubsystemStatusManager.addSubsystem(getName(), turretEncoder, turretMotor);
+    DeviceTempReporter.addDevices(turretMotor);
   }
 
   @Override
@@ -129,7 +131,6 @@ public class Turret extends SubsystemBase {
    }
    
   }
-
   public boolean getTurretAtSetpoint(){
     return getTurretAngle().isNear(targetPosition, 0.015);
   }

@@ -241,4 +241,19 @@ public class RobotMap {
             public static final List<Pose2d> BLUEREEFTAGS = List.of(id2016, id2126, id2236, id1746, id1856, id1966); 
             
     }
+    public static final class ShooterSubsystemConstants {
+        public static final int kLeaderTalonID = 1;
+        public static final int kFollowerTalonID = 2;
+        public static final int kBeamBreakID = 3;
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kS = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+        public static final double kG = 0.0;
+        public static final double kMaxVelocity = 0.0;
+        public static final double kMaxAcceleration = 0.0;
+    }
+
 }
