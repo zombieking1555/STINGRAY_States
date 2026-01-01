@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.RobotMap.DrivetrainConstants;
 import frc.robot.RobotMap.SafetyMap.SwerveConstants;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.posePathfindToReef;
@@ -46,7 +47,7 @@ private Turret turret = new Turret(turretLimelight);
 private TurretArm turretArm = new TurretArm(turretLimelight);
 private LimelightThree3d limelight1 = new LimelightThree3d("limelight1", LEDState.OFF);
 private LimelightThree3d limelight2 = new LimelightThree3d("limelight2", LEDState.OFF);
-private final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+private final CommandSwerveDrivetrain drivetrain = DrivetrainConstants.createDrivetrain();
 private final Telemetry telemetry = new Telemetry(SwerveConstants.MAX_SPEED);
 private SendableChooser<Command> autonChooser;
   public RobotContainer() {

@@ -10,6 +10,13 @@ public class SwerveModuleStatusUtil {
         BL,
         BR;
     }
+    /**
+     * Adds a swerve module's motors and encoder to the SubsystemStatusManager and DeviceTempReporter.
+     * @param loc The location of the swerve module (FL, FR, BL, BR)
+     * @param driveMotorID  ID of the drive motor TalonFX
+     * @param steerMotorID ID of the steer motor TalonFX
+     * @param encoderID ID of the CANcoder encoder
+     */
     public synchronized static void addSwerveModule(ModuleLocation loc, int driveMotorID, int steerMotorID, int encoderID) {
         TalonFX driveMotor = new TalonFX(driveMotorID);
         TalonFX steerMotor = new TalonFX(steerMotorID);

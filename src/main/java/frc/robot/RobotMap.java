@@ -1,16 +1,14 @@
 package frc.robot;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import java.util.List;
 
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -18,7 +16,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
+import frc.robot.subsystems.swerve.CommandSwerveDrivetrain;
 import frc.robot.subsystems.swerve.generated.TunerConstants;
+import frc.robot.utils.SwerveModuleStatusUtil;
 
 public class RobotMap {
 
@@ -40,7 +40,29 @@ public class RobotMap {
         }
     }
 
-  
+    public static class DrivetrainConstants{
+        private static final int kFrontLeftDriveMotorId = 11;
+        private static final int kFrontLeftSteerMotorId = 12;
+        private static final int kFrontLeftEncoderId = 13;
+        private static final int kFrontRightDriveMotorId = 21;
+        private static final int kFrontRightSteerMotorId = 22;
+        private static final int kFrontRightEncoderId = 23;
+        private static final int kBackLeftDriveMotorId = 32;
+        private static final int kBackLeftSteerMotorId = 31;
+        private static final int kBackLeftEncoderId = 33;
+        private static final int kBackRightDriveMotorId = 41;
+        private static final int kBackRightSteerMotorId = 42;
+        private static final int kBackRightEncoderId = 43;
+
+        public static CommandSwerveDrivetrain createDrivetrain(){
+            SwerveModuleStatusUtil.addSwerveModule(SwerveModuleStatusUtil.ModuleLocation.FL, kFrontLeftDriveMotorId, kFrontLeftSteerMotorId, kFrontLeftEncoderId);
+            SwerveModuleStatusUtil.addSwerveModule(SwerveModuleStatusUtil.ModuleLocation.FR, kFrontRightDriveMotorId, kFrontRightSteerMotorId, kFrontRightEncoderId);
+            SwerveModuleStatusUtil.addSwerveModule(SwerveModuleStatusUtil.ModuleLocation.BL, kBackLeftDriveMotorId, kBackLeftSteerMotorId, kBackLeftEncoderId);
+            SwerveModuleStatusUtil.addSwerveModule(SwerveModuleStatusUtil.ModuleLocation.BR, kBackRightDriveMotorId, kBackRightSteerMotorId, kBackRightEncoderId);
+        
+            return TunerConstants.createDrivetrain();
+        }
+    }
 
     // CAN IDs for Swerve Drive System
     public static class SwerveMap {
